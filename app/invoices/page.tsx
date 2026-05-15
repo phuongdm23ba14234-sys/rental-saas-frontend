@@ -145,7 +145,11 @@ export default function InvoicesPage() {
         <FilterButton active={filter === "unpaid"} onClick={() => setFilter("unpaid")}>Chưa thu</FilterButton>
       </div>
 
-      <section className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-4">
+      <section
+        className={`grid grid-cols-1 gap-4 ${
+          editingRoom ? "xl:grid-cols-[1fr_360px]" : ""
+        }`}
+      >
         <div className="bg-white border rounded-xl overflow-hidden">
           <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr_90px] gap-3 px-4 py-3 bg-slate-50 border-b text-[11px] font-bold uppercase text-slate-500">
             <div>Khách thuê</div>
@@ -192,75 +196,75 @@ export default function InvoicesPage() {
           })}
         </div>
 
-        <form onSubmit={saveInvoice} className="bg-white border rounded-xl p-4 h-fit space-y-4">
-          <div>
-            <h2 className="font-bold text-slate-800">Chỉnh hoá đơn</h2>
-            <p className="text-xs text-slate-500 mt-1">
-              {editingRoom
-                ? `${editingRoom.name} · ${editingRoom.tenantName || "Phòng trống"}`
-                : "Bấm Sửa ở một hoá đơn để cập nhật"}
-            </p>
-          </div>
-
-          <fieldset disabled={!editingRoom || isSaving} className="space-y-3 disabled:opacity-50">
-            <Field
-              label="Số điện tháng trước"
-              value={form.prevElectricity}
-              onChange={(value) => setForm({ ...form, prevElectricity: value })}
-            />
-            <Field
-              label="Số điện tháng này"
-              value={form.currElectricity}
-              onChange={(value) => setForm({ ...form, currElectricity: value })}
-            />
-            <Field
-              label="Tiền dịch vụ"
-              value={form.serviceFee}
-              onChange={(value) => setForm({ ...form, serviceFee: value })}
-            />
-          </fieldset>
-
-          {previewRoom && (
-            <div className="rounded-xl bg-slate-50 border p-3 text-sm space-y-2">
-              <div className="flex justify-between text-slate-500">
-                <span>Tiền phòng</span>
-                <strong className="text-slate-700">{money(previewRoom.price)}</strong>
-              </div>
-              <div className="flex justify-between text-slate-500">
-                <span>
-                  Tiền điện ({Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0)} kWh)
-                </span>
-                <strong className="text-slate-700">
-                  {money(Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0) * ELECTRICITY_PRICE)}
-                </strong>
-              </div>
-              <div className="flex justify-between text-slate-500">
-                <span>Dịch vụ</span>
-                <strong className="text-slate-700">{money(previewRoom.serviceFee || 0)}</strong>
-              </div>
-              <div className="flex justify-between border-t pt-2 font-bold text-slate-800">
-                <span>Tổng cộng</span>
-                <span className="text-green-700">{money(totalBill(previewRoom))}</span>
-              </div>
+        {editingRoom && (
+          <form onSubmit={saveInvoice} className="bg-white border rounded-xl p-4 h-fit space-y-4">
+            <div>
+              <h2 className="font-bold text-slate-800">Chỉnh hoá đơn</h2>
+              <p className="text-xs text-slate-500 mt-1">
+                {editingRoom.name} · {editingRoom.tenantName || "Phòng trống"}
+              </p>
             </div>
-          )}
 
-          <div className="flex gap-2">
-            <button
-              disabled={!editingRoom || isSaving}
-              className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isSaving ? "Đang lưu..." : "Lưu hoá đơn"}
-            </button>
-            <button
-              type="button"
-              onClick={closeEdit}
-              className="px-4 bg-slate-100 text-slate-600 py-2 rounded-lg text-sm font-semibold"
-            >
-              Huỷ
-            </button>
-          </div>
-        </form>
+            <fieldset disabled={isSaving} className="space-y-3 disabled:opacity-50">
+              <Field
+                label="Số điện tháng trước"
+                value={form.prevElectricity}
+                onChange={(value) => setForm({ ...form, prevElectricity: value })}
+              />
+              <Field
+                label="Số điện tháng này"
+                value={form.currElectricity}
+                onChange={(value) => setForm({ ...form, currElectricity: value })}
+              />
+              <Field
+                label="Tiền dịch vụ"
+                value={form.serviceFee}
+                onChange={(value) => setForm({ ...form, serviceFee: value })}
+              />
+            </fieldset>
+
+            {previewRoom && (
+              <div className="rounded-xl bg-slate-50 border p-3 text-sm space-y-2">
+                <div className="flex justify-between text-slate-500">
+                  <span>Tiền phòng</span>
+                  <strong className="text-slate-700">{money(previewRoom.price)}</strong>
+                </div>
+                <div className="flex justify-between text-slate-500">
+                  <span>
+                    Tiền điện ({Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0)} kWh)
+                  </span>
+                  <strong className="text-slate-700">
+                    {money(Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0) * ELECTRICITY_PRICE)}
+                  </strong>
+                </div>
+                <div className="flex justify-between text-slate-500">
+                  <span>Dịch vụ</span>
+                  <strong className="text-slate-700">{money(previewRoom.serviceFee || 0)}</strong>
+                </div>
+                <div className="flex justify-between border-t pt-2 font-bold text-slate-800">
+                  <span>Tổng cộng</span>
+                  <span className="text-green-700">{money(totalBill(previewRoom))}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                disabled={isSaving}
+                className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSaving ? "Đang lưu..." : "Lưu hoá đơn"}
+              </button>
+              <button
+                type="button"
+                onClick={closeEdit}
+                className="px-4 bg-slate-100 text-slate-600 py-2 rounded-lg text-sm font-semibold"
+              >
+                Huỷ
+              </button>
+            </div>
+          </form>
+        )}
       </section>
     </div>
   );

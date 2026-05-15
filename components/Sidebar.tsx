@@ -42,8 +42,7 @@ export default function Sidebar() {
           <Home size={24} />
         </div>
         <div>
-          <h1 className="font-bold text-sm leading-none">NhàTrọ Pro</h1>
-          <span className="text-[10px] text-slate-500">Khu trọ Bình Dương</span>
+          <h1 className="font-bold text-sm leading-none">Nhà Trọ Pro</h1>
         </div>
       </div>
 

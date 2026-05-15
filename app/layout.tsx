@@ -3,7 +3,7 @@ import "./globals.css"; // Đảm bảo bạn đã có file này
 import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "NhàTrọ Pro - Quản lý khu trọ",
+  title: "Nhà Trọ Pro",
 };
 
 export default function RootLayout({
