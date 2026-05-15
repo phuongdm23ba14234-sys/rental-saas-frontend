@@ -120,22 +120,32 @@ export default function RoomsPage() {
     const url = editingRoom ? `${ROOMS_API_URL}/${editingRoom.id}` : ROOMS_API_URL;
     const method = editingRoom ? "PATCH" : "POST";
 
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.name,
-        price: Number(form.price),
-        description: form.description,
-        tenantName: form.tenantName,
-        occupants: Number(form.occupants),
-        electricityPrice: Number(form.electricityPrice),
-        serviceFee: Number(form.serviceFee),
-      }),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          price: Number(form.price),
+          description: form.description,
+          tenantName: form.tenantName,
+          occupants: Number(form.occupants),
+          electricityPrice: Number(form.electricityPrice),
+          serviceFee: Number(form.serviceFee),
+        }),
+      });
 
-    closeRoomForm();
-    fetchRooms();
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message || `Lỗi ${res.status}`);
+      }
+
+      closeRoomForm();
+      fetchRooms();
+    } catch (error) {
+      console.error(error);
+      alert(`Không lưu được phòng. ${error instanceof Error ? error.message : ""}`);
+    }
   };
 
   const deleteRoom = async (room: Room) => {
