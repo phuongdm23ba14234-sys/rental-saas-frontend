@@ -10,6 +10,7 @@ type Room = {
   serviceFee: number;
   prevElectricity: number;
   currElectricity: number;
+  electricityPrice?: number;
   tenantName?: string;
   isPaid: boolean;
 };
@@ -17,17 +18,20 @@ type Room = {
 type InvoiceForm = {
   prevElectricity: string;
   currElectricity: string;
+  electricityPrice: string;
   serviceFee: string;
 };
 
-const ELECTRICITY_PRICE = 3500;
+const DEFAULT_ELECTRICITY_PRICE = 3500;
 
 function money(value: number) {
   return value.toLocaleString("vi-VN") + " đ";
 }
 
 function totalBill(room: Room) {
-  const electric = Math.max(room.currElectricity - room.prevElectricity, 0) * ELECTRICITY_PRICE;
+  const electric =
+    Math.max(room.currElectricity - room.prevElectricity, 0) *
+    (room.electricityPrice || DEFAULT_ELECTRICITY_PRICE);
   return room.price + electric + (room.serviceFee || 0);
 }
 
@@ -38,6 +42,7 @@ export default function InvoicesPage() {
   const [form, setForm] = useState<InvoiceForm>({
     prevElectricity: "0",
     currElectricity: "0",
+    electricityPrice: String(DEFAULT_ELECTRICITY_PRICE),
     serviceFee: "0",
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -73,6 +78,7 @@ export default function InvoicesPage() {
     setForm({
       prevElectricity: String(room.prevElectricity || 0),
       currElectricity: String(room.currElectricity || 0),
+      electricityPrice: String(room.electricityPrice || DEFAULT_ELECTRICITY_PRICE),
       serviceFee: String(room.serviceFee || 0),
     });
   };
@@ -82,6 +88,7 @@ export default function InvoicesPage() {
     setForm({
       prevElectricity: "0",
       currElectricity: "0",
+      electricityPrice: String(DEFAULT_ELECTRICITY_PRICE),
       serviceFee: "0",
     });
   };
@@ -92,6 +99,7 @@ export default function InvoicesPage() {
 
     const prevElectricity = Number(form.prevElectricity);
     const currElectricity = Number(form.currElectricity);
+    const electricityPrice = Number(form.electricityPrice);
     const serviceFee = Number(form.serviceFee);
 
     if (currElectricity < prevElectricity) {
@@ -107,6 +115,7 @@ export default function InvoicesPage() {
         body: JSON.stringify({
           prevElectricity,
           currElectricity,
+          electricityPrice,
           serviceFee,
         }),
       });
@@ -128,6 +137,7 @@ export default function InvoicesPage() {
         ...editingRoom,
         prevElectricity: Number(form.prevElectricity),
         currElectricity: Number(form.currElectricity),
+        electricityPrice: Number(form.electricityPrice),
         serviceFee: Number(form.serviceFee),
       }
     : null;
@@ -161,7 +171,9 @@ export default function InvoicesPage() {
           </div>
 
           {invoices.map((room) => {
-            const electric = Math.max(room.currElectricity - room.prevElectricity, 0) * ELECTRICITY_PRICE;
+            const electric =
+              Math.max(room.currElectricity - room.prevElectricity, 0) *
+              (room.electricityPrice || DEFAULT_ELECTRICITY_PRICE);
 
             return (
               <div
@@ -217,6 +229,11 @@ export default function InvoicesPage() {
                 onChange={(value) => setForm({ ...form, currElectricity: value })}
               />
               <Field
+                label="Đơn giá điện / kWh"
+                value={form.electricityPrice}
+                onChange={(value) => setForm({ ...form, electricityPrice: value })}
+              />
+              <Field
                 label="Tiền dịch vụ"
                 value={form.serviceFee}
                 onChange={(value) => setForm({ ...form, serviceFee: value })}
@@ -234,7 +251,10 @@ export default function InvoicesPage() {
                     Tiền điện ({Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0)} kWh)
                   </span>
                   <strong className="text-slate-700">
-                    {money(Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0) * ELECTRICITY_PRICE)}
+                    {money(
+                      Math.max(previewRoom.currElectricity - previewRoom.prevElectricity, 0) *
+                        (previewRoom.electricityPrice || DEFAULT_ELECTRICITY_PRICE)
+                    )}
                   </strong>
                 </div>
                 <div className="flex justify-between text-slate-500">

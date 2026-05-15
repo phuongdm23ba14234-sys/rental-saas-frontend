@@ -12,20 +12,23 @@ type Room = {
   status: string;
   prevElectricity: number;
   currElectricity: number;
+  electricityPrice?: number;
   serviceFee: number;
   tenantName?: string;
   occupants: number;
   isPaid: boolean;
 };
 
-const ELECTRICITY_PRICE = 3500;
+const DEFAULT_ELECTRICITY_PRICE = 3500;
 
 function money(value: number) {
   return value.toLocaleString("vi-VN") + " đ";
 }
 
 function totalBill(room: Room) {
-  const electric = Math.max(room.currElectricity - room.prevElectricity, 0) * ELECTRICITY_PRICE;
+  const electric =
+    Math.max(room.currElectricity - room.prevElectricity, 0) *
+    (room.electricityPrice || DEFAULT_ELECTRICITY_PRICE);
   return room.price + electric + (room.serviceFee || 0);
 }
 
