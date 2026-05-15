@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ROOMS_API_URL } from "@/app/lib/api";
 
 type Room = {
   id: number;
@@ -18,8 +19,6 @@ type InvoiceForm = {
   currElectricity: string;
   serviceFee: string;
 };
-
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/rooms`;
 
 const ELECTRICITY_PRICE = 3500;
 
@@ -44,7 +43,7 @@ export default function InvoicesPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const fetchRooms = async () => {
-    const res = await fetch(API_URL);
+    const res = await fetch(ROOMS_API_URL);
     const data = await res.json();
     setRooms(data);
   };
@@ -52,7 +51,7 @@ export default function InvoicesPage() {
   useEffect(() => {
     let isMounted = true;
 
-    fetch(API_URL)
+    fetch(ROOMS_API_URL)
       .then((res) => res.json())
       .then((data) => {
         if (isMounted) setRooms(data);
@@ -102,7 +101,7 @@ export default function InvoicesPage() {
 
     setIsSaving(true);
     try {
-      const res = await fetch(`${API_URL}/${editingRoom.id}`, {
+      const res = await fetch(`${ROOMS_API_URL}/${editingRoom.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

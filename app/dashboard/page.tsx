@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Bell, Building2, DoorOpen, Receipt, Wallet } from "lucide-react";
+import { ROOMS_API_URL } from "@/app/lib/api";
 
 type Room = {
   id: number;
@@ -17,7 +18,6 @@ type Room = {
   isPaid: boolean;
 };
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/rooms`;
 const ELECTRICITY_PRICE = 3500;
 
 function money(value: number) {
@@ -34,7 +34,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(API_URL)
+    fetch(ROOMS_API_URL)
       .then((res) => res.json())
       .then(setRooms)
       .finally(() => setLoading(false));

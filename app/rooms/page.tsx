@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2, Zap } from "lucide-react";
+import { ROOMS_API_URL } from "@/app/lib/api";
 
 type Room = {
   id: number;
@@ -17,7 +18,6 @@ type Room = {
   isPaid: boolean;
 };
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/rooms`;
 const ELECTRICITY_PRICE = 3500;
 
 function money(value: number) {
@@ -48,7 +48,7 @@ export default function RoomsPage() {
 
   const fetchRooms = async (showLoading = false) => {
     if (showLoading) setLoading(true);
-    const res = await fetch(API_URL);
+    const res = await fetch(ROOMS_API_URL);
     const data = await res.json();
     setRooms(data);
     setLoading(false);
@@ -57,7 +57,7 @@ export default function RoomsPage() {
   useEffect(() => {
     let isMounted = true;
 
-    fetch(API_URL)
+    fetch(ROOMS_API_URL)
       .then((res) => res.json())
       .then((data) => {
         if (isMounted) setRooms(data);
@@ -99,7 +99,7 @@ export default function RoomsPage() {
   const saveRoom = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const url = editingRoom ? `${API_URL}/${editingRoom.id}` : API_URL;
+    const url = editingRoom ? `${ROOMS_API_URL}/${editingRoom.id}` : ROOMS_API_URL;
     const method = editingRoom ? "PATCH" : "POST";
 
     await fetch(url, {
@@ -122,12 +122,12 @@ export default function RoomsPage() {
 
   const deleteRoom = async (room: Room) => {
     if (!confirm(`Xoá ${room.name}?`)) return;
-    await fetch(`${API_URL}/${room.id}`, { method: "DELETE" });
+    await fetch(`${ROOMS_API_URL}/${room.id}`, { method: "DELETE" });
     fetchRooms();
   };
 
   const togglePaid = async (room: Room) => {
-    await fetch(`${API_URL}/${room.id}`, {
+    await fetch(`${ROOMS_API_URL}/${room.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ isPaid: !room.isPaid }),
@@ -147,7 +147,7 @@ export default function RoomsPage() {
     e.preventDefault();
     if (!electricRoom) return;
 
-    await fetch(`${API_URL}/${electricRoom.id}`, {
+    await fetch(`${ROOMS_API_URL}/${electricRoom.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
