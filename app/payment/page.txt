@@ -1,0 +1,110 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+type Room = {
+  id: number;
+  name: string;
+  price: number;
+  serviceFee: number;
+  prevElectricity: number;
+  currElectricity: number;
+  tenantName?: string;
+  isPaid: boolean;
+};
+
+const API_URL = "http://localhost:8080/rooms";
+const ELECTRICITY_PRICE = 3500;
+
+function money(value: number) {
+  return value.toLocaleString("vi-VN") + " đ";
+}
+
+function totalBill(room: Room) {
+  const electric = Math.max(room.currElectricity - room.prevElectricity, 0) * ELECTRICITY_PRICE;
+  return room.price + electric + (room.serviceFee || 0);
+}
+
+export default function InvoicesPage() {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [filter, setFilter] = useState<"all" | "paid" | "unpaid">("all");
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then(setRooms);
+  }, []);
+
+  const invoices = useMemo(() => {
+    if (filter === "paid") return rooms.filter((room) => room.isPaid);
+    if (filter === "unpaid") return rooms.filter((room) => !room.isPaid);
+    return rooms;
+  }, [rooms, filter]);
+
+  return (
+    <div className="space-y-5">
+      <header className="bg-white border rounded-xl px-5 py-4">
+        <h1 className="font-bold text-slate-800">Hoá đơn</h1>
+        <p className="text-xs text-slate-500">Theo dõi tiền phòng, điện và phí dịch vụ hàng tháng</p>
+      </header>
+
+      <div className="flex gap-2">
+        <FilterButton active={filter === "all"} onClick={() => setFilter("all")}>Tất cả</FilterButton>
+        <FilterButton active={filter === "paid"} onClick={() => setFilter("paid")}>Đã thu</FilterButton>
+        <FilterButton active={filter === "unpaid"} onClick={() => setFilter("unpaid")}>Chưa thu</FilterButton>
+      </div>
+
+      <div className="bg-white border rounded-xl overflow-hidden">
+        <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3 px-4 py-3 bg-slate-50 border-b text-[11px] font-bold uppercase text-slate-500">
+          <div>Khách thuê</div>
+          <div>Tiền phòng</div>
+          <div>Tiền điện</div>
+          <div>Tổng</div>
+          <div>Trạng thái</div>
+        </div>
+
+        {invoices.map((room) => {
+          const electric = Math.max(room.currElectricity - room.prevElectricity, 0) * ELECTRICITY_PRICE;
+
+          return (
+            <div key={room.id} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3 px-4 py-3 border-b last:border-b-0 items-center text-sm">
+              <div>
+                <div className="font-semibold text-slate-800">{room.tenantName || "Phòng trống"}</div>
+                <div className="text-xs text-slate-500">{room.name}</div>
+              </div>
+              <div className="text-slate-700">{money(room.price)}</div>
+              <div className="text-slate-700">{money(electric)}</div>
+              <div className="font-bold text-slate-800">{money(totalBill(room))}</div>
+              <div>
+                <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${room.isPaid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                  {room.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FilterButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-lg border text-sm font-semibold ${
+        active ? "bg-green-600 border-green-600 text-white" : "bg-white text-slate-500"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}

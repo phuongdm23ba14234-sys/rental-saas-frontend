@@ -17,7 +17,7 @@ type Room = {
   isPaid: boolean;
 };
 
-const API_URL = "http://localhost:8080/rooms";
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/rooms`;
 const ELECTRICITY_PRICE = 3500;
 
 function money(value: number) {
