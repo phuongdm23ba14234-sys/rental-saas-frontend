@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css"; // Đảm bảo bạn đã có file này
-import Sidebar from "@/components/Sidebar";
-import ServiceWorkerRegister from "./ServiceWorkerRegister";
+import AppShell from "@/components/AppShell";
 
 export const metadata: Metadata = {
   title: "Nhà Trọ Pro",
@@ -29,18 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body className="bg-slate-50 text-slate-900 flex h-screen overflow-hidden">
-        <ServiceWorkerRegister />
-        {/* Sidebar bên trái */}
-        <Sidebar />
-        
-        {/* Vùng nội dung bên phải */}
-        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-4 md:p-8">
-            {children}
-          </div>
-        </main>
-      </body>
+      <AppShell>{children}</AppShell>
     </html>
   );
 }
