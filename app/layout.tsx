@@ -1,9 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css"; // Đảm bảo bạn đã có file này
 import Sidebar from "@/components/Sidebar";
+import ServiceWorkerRegister from "./ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   title: "Nhà Trọ Pro",
+  description: "Manage rental rooms, tenants, invoices, electricity usage, service fees, and payment status.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Rental SaaS",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#16a34a",
 };
 
 export default function RootLayout({
@@ -14,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="bg-slate-50 text-slate-900 flex h-screen overflow-hidden">
+        <ServiceWorkerRegister />
         {/* Sidebar bên trái */}
         <Sidebar />
         
